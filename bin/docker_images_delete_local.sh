@@ -15,8 +15,10 @@
 #   limitations under the License.
 #
 # ==================================================================================
-docker rmi tm
-docker rmi data-extraction
-docker rmi kfadapter
-docker rmi aiml-dashboard
-docker rmi aiml-notebook
+sudo nerdctl --namespace k8s.io rmi tm:latest
+sudo nerdctl --namespace k8s.io rmi data-extraction:latest
+sudo nerdctl --namespace k8s.io rmi kfadapter:latest
+sudo nerdctl --namespace k8s.io rmi aiml-dashboard:latest
+sudo nerdctl --namespace k8s.io rmi aiml-notebook:latest
+sudo nerdctl --namespace k8s.io rmi kserve-adapter:1.0.1
+sudo nerdctl --namespace k8s.io rmi modelmgmtservice:latest 

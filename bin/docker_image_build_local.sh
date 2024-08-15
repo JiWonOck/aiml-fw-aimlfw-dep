@@ -22,12 +22,58 @@ git clone "https://gerrit.o-ran-sc.org/r/aiml-fw/awmf/tm"
 git clone "https://gerrit.o-ran-sc.org/r/aiml-fw/athp/data-extraction"
 git clone "https://gerrit.o-ran-sc.org/r/aiml-fw/athp/tps/kubeflow-adapter"
 git clone "https://gerrit.o-ran-sc.org/r/portal/aiml-dashboard"
+git clone "https://gerrit.o-ran-sc.org/r/aiml-fw/aihp/ips/kserve-adapter"
+git clone "https://gerrit.o-ran-sc.org/r/aiml-fw/awmf/modelmgmtservice"
 
-docker build -f tm/Dockerfile -t tm tm/.
-docker build -f data-extraction/Dockerfile -t data-extraction data-extraction/.
-docker build -f kubeflow-adapter/Dockerfile -t kfadapter kubeflow-adapter/.
-docker build -f aiml-dashboard/Dockerfile -t aiml-dashboard aiml-dashboard/.
-docker build -f aiml-dashboard/kf-pipelines/Dockerfile -t aiml-notebook aiml-dashboard/kf-pipelines/.
+sudo buildctl --addr=nerdctl-container://buildkitd build \
+	--frontend dockerfile.v0 \
+	--opt filename=Dockerfile \
+	--local dockerfile=tm \
+	--local context=tm \
+	--output type=oci,name=tm:latest | sudo nerdctl load --namespace k8s.io
+
+sudo buildctl --addr=nerdctl-container://buildkitd build \
+    --frontend dockerfile.v0 \
+    --opt filename=Dockerfile \
+    --local dockerfile=data-extraction \
+    --local context=data-extraction \
+    --output type=oci,name=data-extraction:latest | sudo nerdctl load --namespace k8s.io
+
+
+sudo buildctl --addr=nerdctl-container://buildkitd build \
+    --frontend dockerfile.v0 \
+    --opt filename=Dockerfile \
+    --local dockerfile=kubeflow-adapter \
+    --local context=kubeflow-adapter \
+    --output type=oci,name=kfadapter:latest | sudo nerdctl load --namespace k8s.io
+
+sudo buildctl --addr=nerdctl-container://buildkitd build \
+    --frontend dockerfile.v0 \
+    --opt filename=Dockerfile \
+    --local dockerfile=aiml-dashboard \
+    --local context=aiml-dashboard \
+    --output type=oci,name=aiml-dashboard:latest | sudo nerdctl load --namespace k8s.io
+
+sudo buildctl --addr=nerdctl-container://buildkitd build \
+    --frontend dockerfile.v0 \
+    --opt filename=Dockerfile \
+    --local dockerfile=aiml-dashboard/kf-pipelines \
+    --local context=aiml-dashboard/kf-pipelines \
+    --output type=oci,name=aiml-notebook:latest | sudo nerdctl load --namespace k8s.io
+
+sudo buildctl --addr=nerdctl-container://buildkitd build \
+    --frontend dockerfile.v0 \
+    --opt filename=Dockerfile \
+    --local dockerfile=kserve-adapter \
+    --local context=kserve-adapter \
+    --output type=oci,name=kserve-adapter:1.0.1 | sudo nerdctl load --namespace k8s.io
+
+sudo buildctl --addr=nerdctl-container://buildkitd build \
+    --frontend dockerfile.v0 \
+    --opt filename=Dockerfile \
+    --local dockerfile=modelmgmtservice \
+    --local context=modelmgmtservice \
+    --output type=oci,name=modelmgmtservice:latest | sudo nerdctl load --namespace k8s.io
 
 cd -
 rm -Rf /tmp/gerrit_code

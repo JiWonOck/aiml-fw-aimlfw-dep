@@ -17,13 +17,25 @@
 # ==================================================================================
 
 #!/bin/bash
+#set -e
 
-echo "Installing servecm (Chart Manager) and common templates to helm3"
+if [ -z $(helm plugin list | grep servecm | awk '{print $1}') ];
+then
+        echo "Installing servecm (Chart Manager) and common templates to helm3"
 
-helm plugin install https://github.com/jdolitsky/helm-servecm
-eval $(helm env |grep HELM_REPOSITORY_CACHE) 
+        helm plugin install https://github.com/jdolitsky/helm-servecm
+else
+        echo "Found servecm in the helm plugin list. Skip servecm installation."
+fi
+
+#The hardcoded location does not work anymore, Reference: change similar to RIC-966 updating chartmuseum and docker refs
+curl -LO https://get.helm.sh/chartmuseum-v0.15.0-linux-386.tar.gz
+tar xzvf chartmuseum-v0.15.0-linux-386.tar.gz
+chmod +x ./linux-386/chartmuseum
+sudo cp ./linux-386/chartmuseum /usr/local/bin
+
+eval $(helm env | grep HELM_REPOSITORY_CACHE)
 echo ${HELM_REPOSITORY_CACHE}
-
 helm servecm --port=8879 --context-path=/charts --storage local --storage-local-rootdir $HELM_REPOSITORY_CACHE/local/ <<EOF &
 yes
 EOF

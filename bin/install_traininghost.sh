@@ -15,26 +15,20 @@
 #   limitations under the License.
 #
 # ==================================================================================
-#Checking whether the user is added in the docker group or not.
-if [[ $(groups | grep docker) ]]; then
-        echo "You are already added to the docker group!"
-else
-    sudo groupadd docker	
-    sudo usermod -aG docker $USER
-    echo "Adding you to the docker group re-login is required."
-    echo "Exiting now try to login again."
-    exit
-fi
 
 tools/kubernetes/install_k8s.sh
+kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 tools/nfs/configure_nfs_server.sh localhost
 tools/helm/install_helm.sh
 tools/nfs/install_nfs_subdir_external_provisioner.sh localhost
 
-sudo bin/install_common_templates_to_helm.sh
+bin/install_common_templates_to_helm.sh
+bin/build_default_pipeline_image.sh
 tools/leofs/bin/install_leofs.sh
 tools/kubeflow/bin/install_kubeflow.sh
 kubectl create namespace traininghost
+#copy of secrets to traininghost namespace to enable modelmanagement service to access leofs
+kubectl get secret leofs-secret --namespace=kubeflow -o yaml | sed -e 's/kubeflow/traininghost/g' | kubectl apply -f -
 
 bin/install_rolebindings.sh
 bin/install_databases.sh

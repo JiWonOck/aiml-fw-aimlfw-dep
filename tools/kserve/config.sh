@@ -1,0 +1,6 @@
+#!/bin/bash
+export ISTIO_VERSION=1.22.3
+export TARGET_ARCH=x86_64
+export KNATIVE_VERSION=knative-v1.14.1
+export CERT_MANAGER_VERSION=v1.3.0
+export KSERVE_VERSION=v0.11.1
